@@ -421,51 +421,49 @@
                         Quick questions, project inquiries, or partnership discussions - we're here to help.
                     </p>
                     
-                  <form class="space-y-6" id="contact-form">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-            <label class="block text-sm font-medium text-text-primary mb-2">Name *</label>
-            <input type="text" class="input-field w-full" id="name" placeholder="Your name" required />
-        </div>
-
-        <div>
-            <label class="block text-sm font-medium text-text-primary mb-2">Email *</label>
-            <input type="email" class="input-field w-full" id="email" placeholder="your@email.com" required />
-        </div>
-    </div>
-
-    <div>
-        <label class="block text-sm font-medium text-text-primary mb-2">Subject</label>
-        <select class="input-field w-full" id="inquiry">
-            <option value>Select inquiry type</option>
-            <option value="New Project Inquiry">New Project Inquiry</option>
-            <option value="Partnership Opportunity">Partnership Opportunity</option>
-            <option value="Support Request">Support Request</option>
-            <option value="Collaboration Proposal">Collaboration Proposal</option>
-            <option value="Other">Other</option>
-        </select>
-    </div>
-
-    <div>
-        <label class="block text-sm font-medium text-text-primary mb-2">Message *</label>
-        <textarea id="message" class="input-field w-full h-32 resize-none" placeholder="Tell us about your project or inquiry..." required></textarea>
-    </div>
-
-    <div class="flex items-center">
-        <input type="checkbox" id="newsletter" class="mr-3 text-accent" />
-        <label for="newsletter" class="text-sm text-text-secondary">
-            Subscribe to our newsletter for design insights and South African business spotlights
-        </label>
-    </div>
-
-    <button type="submit" class="btn-primary w-full text-lg py-4">
-        Send Message
-        <svg class="w-5 h-5 ml-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
-        </svg>
-    </button>
-</form>
-
+                    <form class="space-y-6" id="contact-form">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-text-primary mb-2">Name *</label>
+                                <input type="text" class="input-field w-full" placeholder="Your name" required />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-text-primary mb-2">Email *</label>
+                                <input type="email" class="input-field w-full" placeholder="your@email.com" required />
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-text-primary mb-2">Subject</label>
+                            <select class="input-field w-full">
+                                <option value>Select inquiry type</option>
+                                <option value="project">New Project Inquiry</option>
+                                <option value="partnership">Partnership Opportunity</option>
+                                <option value="support">Support Request</option>
+                                <option value="collaboration">Collaboration Proposal</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-text-primary mb-2">Message *</label>
+                            <textarea class="input-field w-full h-32 resize-none" placeholder="Tell us about your project or inquiry..." required></textarea>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <input type="checkbox" id="newsletter" class="mr-3 text-accent" />
+                            <label for="newsletter" class="text-sm text-text-secondary">
+                                Subscribe to our newsletter for design insights and South African business spotlights
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary w-full text-lg py-4">
+                            Send Message
+                            <svg class="w-5 h-5 ml-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                            </svg>
+                        </button>
+                    </form>
                 </div>
                 
                 <!-- Location & Contact Info -->
@@ -936,35 +934,6 @@
                 }
             });
         });
-
-document.getElementById("contact-form").addEventListener("submit", sendToWhatsApp);
-
-function sendToWhatsApp(event) {
-    event.preventDefault();
-
-    const name = document.getElementById('name').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const inquiry = document.getElementById('inquiry').value.trim();
-    const message = document.getElementById('message').value.trim();
-    const newsletter = document.getElementById('newsletter').checked ? "Yes" : "No";
-
-    const whatsappNumber = "27813864024";
-
-    const textMessage = `
-New Inquiry Received:
-
-Name: ${name}
-Email: ${email}
-Subject: ${inquiry}
-Message: ${message}
-Subscribe to Newsletter: ${newsletter}
-    `;
-
-    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(textMessage)}`;
-
-    window.open(url, "_blank");
-}
-
     </script>
 <script id="dhws-dataInjector" src="../public/dhws-data-injector.js"></script>
 </body>
