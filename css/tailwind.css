@@ -91,3 +91,35 @@
     transform: translateY(0);
   }
 }
+
+/* --------------------------------------------- */
+/* Fade-Up Animation */
+/* --------------------------------------------- */
+@keyframes fadeUp {
+  0% { 
+    opacity: 0; 
+    transform: translateY(30px); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+.fade-up {
+  opacity: 0;
+  animation: fadeUp 1.2s ease-out forwards;
+}
+
+.fade-up-delay-1 {
+  opacity: 0;
+  animation: fadeUp 1.2s ease-out forwards;
+  animation-delay: 0.3s;
+}
+
+.fade-up-delay-2 {
+  opacity: 0;
+  animation: fadeUp 1.2s ease-out forwards;
+  animation-delay: 0.6s;
+}
+
