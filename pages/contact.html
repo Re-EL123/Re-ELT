@@ -945,17 +945,15 @@ function sendToWhatsApp(event) {
 
     const whatsappNumber = "27813864024";
 
-    const textMessage = `
-New Inquiry Received:
 
-Name: ${name}
-Email: ${email}
-Subject: ${inquiry}
-Message: ${message}
-Subscribe to Newsletter: ${newsletter}
-    `;
 
-    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(textMessage)}`;
+    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(New Inquiry Received:\n
+
+Name: ${name}\n
+Email: ${email}\n
+Subject: ${inquiry}\n
+Message: ${message}\n
+Subscribe to Newsletter: ${newsletter})}`;
 
     window.open(url, "_blank");
 }
