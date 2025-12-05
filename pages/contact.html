@@ -291,7 +291,7 @@
                     <div class="card">
                         <h3 class="font-poppins font-semibold text-2xl mb-6">Tell Us About Your Project</h3>
                         
-                        <form class="space-y-6" id="consultation-form">
+                        <form class="space-y-6" id="consultation-form" data-whatsapp-number="27813864024" data-whatsapp-preamble="Consultation booking:">
                             <!-- Contact Information -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
@@ -421,7 +421,7 @@
                         Quick questions, project inquiries, or partnership discussions - we're here to help.
                     </p>
                     
-                    <form class="space-y-6" id="contact-form">
+                    <form class="space-y-6" id="contact-form" data-whatsapp-number="27813864024" data-whatsapp-preamble="Contact message:">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-text-primary mb-2">Name *</label>
@@ -880,11 +880,8 @@
             alert(`Opening ${type} partnership form. This would typically open a modal or redirect to a dedicated form.`);
         }
 
-        // Form Validation
-        document.getElementById('consultation-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Thank you for booking a consultation! We\'ll confirm your appointment within 2 hours.');
-        });
+        // (removed simple consultation alert) form submit handling is replaced
+        // by the unified WhatsApp handler below.
 
 
         // Calendar Date Selection
@@ -935,37 +932,86 @@
     </script>
 <script id="dhws-dataInjector" src="../public/dhws-data-injector.js"></script>
 
-<!-- Fix: override broken sendToWhatsApp handler with a safe implementation -->
+<!-- Unified WhatsApp form submit handler: attaches to multiple forms -->
 <script>
     (function() {
-        const form = document.getElementById('contact-form');
-        if (!form) return;
+        const defaultWhatsApp = '27813864024';
 
-        function sendToWhatsAppFixed(event) {
-            event.preventDefault();
-            try {
-                alert("Thank you for your message! We'll respond in an hour or 2 during business hours.");
-
-                const name = document.getElementById('name').value.trim();
-                const email = document.getElementById('email').value.trim();
-                const inquiry = document.getElementById('inquiry').value.trim();
-                const message = document.getElementById('message').value.trim();
-                const newsletter = document.getElementById('newsletter').checked ? 'Yes' : 'No';
-
-                const whatsappNumber = '27813864024';
-
-                const textMessage = `New Inquiry Received:\n\nName: ${name}\nEmail: ${email}\nSubject: ${inquiry}\nMessage: ${message}\nSubscribe to Newsletter: ${newsletter}`;
-
-                const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(textMessage)}`;
-                window.open(url, '_blank');
-            } catch (err) {
-                console.error('WhatsApp send error:', err);
+        function getLabel(el, form) {
+            if (el.id) {
+                const lbl = form.querySelector(`label[for="${el.id}"]`) || document.querySelector(`label[for="${el.id}"]`);
+                if (lbl) return lbl.textContent.trim();
             }
+            const parentLabel = el.closest('label');
+            if (parentLabel) return parentLabel.textContent.trim();
+            const prev = el.previousElementSibling;
+            if (prev && prev.tagName && prev.tagName.toLowerCase() === 'label') return prev.textContent.trim();
+            if (el.placeholder) return el.placeholder;
+            if (el.name) return el.name;
+            return el.type || 'field';
         }
 
-        // Remove any previous submit handlers we can access (best-effort) and add fixed handler
-        try { form.removeEventListener('submit', window.sendToWhatsApp); } catch (e) {}
-        form.addEventListener('submit', sendToWhatsAppFixed);
+        function buildMessageFromForm(form) {
+            const parts = [];
+            const elements = Array.from(form.querySelectorAll('input, select, textarea'));
+            const radioSeen = new Set();
+            elements.forEach(el => {
+                if (!el || el.disabled) return;
+                const type = (el.type || '').toLowerCase();
+                if (type === 'submit' || type === 'button' || type === 'file') return;
+                const label = getLabel(el, form);
+
+                if (type === 'checkbox') {
+                    parts.push(`${label}: ${el.checked ? 'Yes' : 'No'}`);
+                    return;
+                }
+
+                if (type === 'radio') {
+                    if (!el.name) return;
+                    if (radioSeen.has(el.name)) return;
+                    radioSeen.add(el.name);
+                    const checked = form.querySelector(`input[name="${el.name}"]:checked`);
+                    parts.push(`${label}: ${checked ? checked.value : ''}`);
+                    return;
+                }
+
+                const value = (el.value || '').trim();
+                parts.push(`${label}: ${value}`);
+            });
+            return parts.filter(Boolean).join('\n');
+        }
+
+        function attachWhatsAppHandler(form) {
+            if (!form) return;
+            // Prevent double-attach
+            if (form.__whatsappAttached) return;
+            form.__whatsappAttached = true;
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                try {
+                    const phoneRaw = form.dataset.whatsappNumber || window.WHATSAPP_NUMBER || defaultWhatsApp;
+                    const phone = (phoneRaw || '').toString().replace(/[^0-9+]/g, '');
+                    if (!phone) {
+                        alert('WhatsApp phone number not configured for this form. Please set `data-whatsapp-number` on the form or `window.WHATSAPP_NUMBER`.');
+                        return;
+                    }
+
+                    const preamble = form.dataset.whatsappPreamble || 'New website submission:';
+                    const messageBody = buildMessageFromForm(form) || '(no details provided)';
+                    const fullMessage = `${preamble}\n\n${messageBody}`;
+                    const url = `https://wa.me/${phone}?text=${encodeURIComponent(fullMessage)}`;
+                    window.open(url, '_blank');
+                } catch (err) {
+                    console.error('Error sending to WhatsApp', err);
+                    alert('Unable to open WhatsApp.');
+                }
+            });
+        }
+
+        // Attach to known forms on this page
+        attachWhatsAppHandler(document.getElementById('contact-form'));
+        attachWhatsAppHandler(document.getElementById('consultation-form'));
     })();
 </script>
 
