@@ -435,7 +435,7 @@
                         
                         <div>
                             <label class="block text-sm font-medium text-text-primary mb-2">Subject</label>
-                            <select class="input-field w-full" id="inquiry>
+                            <select class="input-field w-full" id="inquiry">
                                 <option value>Select inquiry type</option>
                                 <option value="project">New Project Inquiry</option>
                                 <option value="partnership">Partnership Opportunity</option>
@@ -930,35 +930,44 @@
                 }
             });
         });
-
-        document.getElementById("contact-form").addEventListener("submit", sendToWhatsApp);
-
-function sendToWhatsApp(event) {
-    event.preventDefault();
-    alert('Thank you for your message! We\'ll respond in an hour or 2 during business hours.');
-
-    const name = document.getElementById('name').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const inquiry = document.getElementById('inquiry').value.trim();
-    const message = document.getElementById('message').value.trim();
-    const newsletter = document.getElementById('newsletter').checked ? "Yes" : "No";
-
-    const whatsappNumber = "27813864024";
-
-
-
-    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(New Inquiry Received:\n
-
-Name: ${name}\n
-Email: ${email}\n
-Subject: ${inquiry}\n
-Message: ${message}\n
-Subscribe to Newsletter: ${newsletter})}`;
-
-    window.open(url, "_blank");
-}
+        // Original sendToWhatsApp removed — replaced by a safe handler below.
 
     </script>
 <script id="dhws-dataInjector" src="../public/dhws-data-injector.js"></script>
+
+<!-- Fix: override broken sendToWhatsApp handler with a safe implementation -->
+<script>
+    (function() {
+        const form = document.getElementById('contact-form');
+        if (!form) return;
+
+        function sendToWhatsAppFixed(event) {
+            event.preventDefault();
+            try {
+                alert("Thank you for your message! We'll respond in an hour or 2 during business hours.");
+
+                const name = document.getElementById('name').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const inquiry = document.getElementById('inquiry').value.trim();
+                const message = document.getElementById('message').value.trim();
+                const newsletter = document.getElementById('newsletter').checked ? 'Yes' : 'No';
+
+                const whatsappNumber = '27813864024';
+
+                const textMessage = `New Inquiry Received:\n\nName: ${name}\nEmail: ${email}\nSubject: ${inquiry}\nMessage: ${message}\nSubscribe to Newsletter: ${newsletter}`;
+
+                const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(textMessage)}`;
+                window.open(url, '_blank');
+            } catch (err) {
+                console.error('WhatsApp send error:', err);
+            }
+        }
+
+        // Remove any previous submit handlers we can access (best-effort) and add fixed handler
+        try { form.removeEventListener('submit', window.sendToWhatsApp); } catch (e) {}
+        form.addEventListener('submit', sendToWhatsAppFixed);
+    })();
+</script>
+
 </body>
 </html>
